@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
 import GenerateSongs from "./songGenerator";
-import { getSession } from "@auth0/nextjs-auth0"; // Import getSession from Auth0
 import fetch from "node-fetch";
 
 export const config = {
@@ -20,7 +19,8 @@ export async function POST(req) {
       throw new Error("No file uploaded");
     }
 
-    const UPLOAD_DIR = path.join(process.cwd(), "app", "UPLOADS");
+    // Use the /tmp directory for file uploads
+    const UPLOAD_DIR = path.join("/tmp", "UPLOADS");
     await fs.mkdir(UPLOAD_DIR, { recursive: true });
 
     const fileExt = path.extname(file.name).toLowerCase();

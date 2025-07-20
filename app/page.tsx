@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useUser } from "@auth0/nextjs-auth0";
 import MusicPanel from "./components/MusicPanel";
 import LoadingPanel from "./components/LoadingPanel";
 
@@ -16,11 +15,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [videoURL, setVideoURL] = useState<string | null>(null);
   const [songs, setSongs] = useState([]);
-
-  {
-    /* Auth0 user state */
-  }
-  const { user, isLoading } = useUser();
 
   {
     /* event handlers */
@@ -139,7 +133,7 @@ export default function Home() {
         className="flex flex-col w-full p-2 gap-2 h-full rounded-2xl"
         style={gradientStyle}
       >
-        {/* Header with title and auth buttons */}
+        {/* Header with title */}
         <div className="flex justify-between items-center p-8">
           <div
             className={`${
@@ -147,29 +141,6 @@ export default function Home() {
             } transition-all duration-1000 color-white font-light tracking-[1em] text-white`}
           >
             WEAVER
-          </div>
-          <div className="flex gap-4 items-center">
-            {isLoading && (
-              <div className="px-6 py-2 bg-white/20 backdrop-blur-sm text-white font-medium rounded-full border border-white/30">
-                Loading...
-              </div>
-            )}
-            {!isLoading && !user && (
-              <a
-                href="/auth/login"
-                className="px-6 py-2 bg-white/20 backdrop-blur-sm text-white font-medium rounded-full hover:bg-white/30 transition-all duration-300 border border-white/30"
-              >
-                Login
-              </a>
-            )}
-            {!isLoading && user && (
-              <a
-                href="/auth/logout"
-                className="px-6 py-2 bg-white/20 backdrop-blur-sm text-white font-medium rounded-full hover:bg-white/30 transition-all duration-300 border border-white/30"
-              >
-                Logout
-              </a>
-            )}
           </div>
         </div>
 
