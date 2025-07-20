@@ -1,0 +1,44 @@
+:root {
+  --dark-color: #030814;
+}
+
+.bg-main {
+  background-color: var(--dark-color);
+}
+
+.bg-button {
+  background-color: white;
+  color: var(--dark-color);
+}
+
+.loading-panel {
+  opacity: 0;
+  animation: logoReveal 1s forwards;
+}
+
+.song {
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes logoReveal {
+  0% {
+    width: 0px;
+    filter: blur(8px);
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
