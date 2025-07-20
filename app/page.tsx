@@ -13,6 +13,8 @@ export default function Home() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [buildPressed, setBuildPressed] = useState(false);
   const [playlistMade, setPlaylistMade] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   {
     /* Auth0 user state */
@@ -26,6 +28,43 @@ export default function Home() {
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     setMousePos({ x: event.clientX, y: event.clientY });
   };
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setError(null);
+    if (e.target.files && e.target.files.length === 1) {
+      const selectedFile = e.target.files[0];
+
+      // Basic validation
+      if (!selectedFile.type.startsWith("video/")) {
+        setError("Please select a video file");
+        return;
+      }
+
+      setFile(selectedFile);
+    }
+  }
+
+  async function handleUpload() {
+    if (!file) {
+      setError("Please select a file first");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("video", file);
+
+    try {
+      const response = await fetch("/api/twelve/upload", {
+        method: "POST",
+        body: formData,
+      });
+      setPlaylistMade(true);
+    } catch (err) {
+      const error =
+        err instanceof Error ? err.message : "An unknown error occurred";
+      setError(error);
+    }
+  }
 
   {
     /* gradient for div element */
@@ -84,19 +123,29 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex w-full h-2/3 rounded bg-main">
-          {/* <VideoDisplay /> */}
-        </div>
+        {/* File input */}
+        <input
+          onChange={handleFileChange}
+          type="file"
+          accept="video/*"
+          className="w-full h-1/2 bg-black rounded"
+        ></input>
 
         {/* Centered button */}
         <div className="flex justify-center items-center p-8">
           <button
-            onClick={handleButtonClick}
+            onClick={() => {
+              handleButtonClick();
+              handleUpload();
+            }}
             className="flex justify-center items-center w-3/4 h-30 text-3xl font-bold rounded-full bg-button"
           >
             {buttonText}
           </button>
         </div>
+
+        {/* Error message */}
+        {error && <div className="text-red-500 text-center mt-4">{error}</div>}
       </div>
       {buildPressed && !playlistMade && <LoadingPanel />}
       {buildPressed && playlistMade && (
