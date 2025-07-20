@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function LoadingPanel() {
   return (
-    <div className="loading-panel flex w-full h-full items-center justify-center bg-black">
+    <div className="loading-panel flex w-full h-full items-center justify-center bg-main">
       <Image
         src="/beaver-loading.gif"
         alt="loading gif"

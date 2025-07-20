@@ -1,7 +1,11 @@
 import Song from "./Song";
 import "./components.css";
 
-function MusicPanel() {
+interface MusicPanelProps {
+  background: string;
+}
+
+function MusicPanel(props: MusicPanelProps) {
   const songs = [
     { title: "AnySong", description: "some description" },
     { title: "AnySong1", description: "another description" },
@@ -9,7 +13,7 @@ function MusicPanel() {
   ];
 
   return (
-    <div className="flex flex-col gap-2 w-full bg-black">
+    <div className={`flex flex-col gap-2 w-full ${props.background}`}>
       {songs.map((song) => (
         <Song
           key={song.title}

@@ -1,3 +1,16 @@
+:root {
+  --dark-color: #030814;
+}
+
+.bg-main {
+  background-color: var(--dark-color);
+}
+
+.bg-button {
+  background-color: white;
+  color: var(--dark-color);
+}
+
 .loading-panel {
   opacity: 0;
   animation: logoReveal 1s forwards;
