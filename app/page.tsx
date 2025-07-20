@@ -31,7 +31,7 @@ export default function Home() {
           >
             BUILD YOUR CUSTOM PLAYLIST
           </button>
-          // test
+          {/* test */}
           <button
             onClick={testPlaylistMade}
             className="flex justify-around items-center w-3/4 h-20 text-2xl font-bold bg-green-50 rounded-full"
