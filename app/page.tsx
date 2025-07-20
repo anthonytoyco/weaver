@@ -15,6 +15,7 @@ export default function Home() {
   const [playlistMade, setPlaylistMade] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [videoURL, setVideoURL] = useState<string | null>(null);
 
   {
     /* Auth0 user state */
@@ -24,7 +25,13 @@ export default function Home() {
   {
     /* event handlers */
   }
-  const handleButtonClick = () => setBuildPressed(true);
+  const handleButtonClick = () => {
+    if (file) {
+      setBuildPressed(true);
+      handleUpload();
+    }
+  };
+
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     setMousePos({ x: event.clientX, y: event.clientY });
   };
@@ -41,6 +48,7 @@ export default function Home() {
       }
 
       setFile(selectedFile);
+      setVideoURL(URL.createObjectURL(selectedFile)); // Create a URL for the video file
     }
   }
 
@@ -58,7 +66,11 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
-      setPlaylistMade(true);
+
+      // Simulate loading for 5 seconds
+      setTimeout(() => {
+        setPlaylistMade(true);
+      }, 5000);
     } catch (err) {
       const error =
         err instanceof Error ? err.message : "An unknown error occurred";
@@ -123,22 +135,39 @@ export default function Home() {
           </div>
         </div>
 
-        {/* File input */}
-        <input
-          onChange={handleFileChange}
-          type="file"
-          accept="video/*"
-          className="w-full h-1/2 bg-black rounded"
-        ></input>
+        {/* File input or video player */}
+        {videoURL ? (
+          <div className="flex justify-center items-center w-full h-1/2 bg-black rounded">
+            <video
+              src={videoURL}
+              controls
+              className="w-3/4 h-full rounded"
+            ></video>
+          </div>
+        ) : (
+          <label
+            htmlFor="file-upload"
+            className="flex justify-center items-center w-full h-1/2 bg-black rounded cursor-pointer text-gray-400"
+          >
+            <span>Click here to add video</span>
+            <input
+              id="file-upload"
+              onChange={handleFileChange}
+              type="file"
+              accept="video/*"
+              className="hidden"
+            />
+          </label>
+        )}
 
         {/* Centered button */}
         <div className="flex justify-center items-center p-8">
           <button
-            onClick={() => {
-              handleButtonClick();
-              handleUpload();
-            }}
-            className="flex justify-center items-center w-3/4 h-30 text-3xl font-bold rounded-full bg-button"
+            onClick={handleButtonClick}
+            disabled={!file}
+            className={`flex justify-center items-center w-3/4 h-30 text-3xl font-bold rounded-full ${
+              file ? "bg-button" : "bg-gray-400 cursor-not-allowed"
+            }`}
           >
             {buttonText}
           </button>
