@@ -46,8 +46,6 @@ const MusicPanel: React.FC<MusicPanelProps> = ({ songs }) => {
             className="flex items-center p-4 rounded-lg bg-white/20 backdrop-blur-md text-white shadow-md hover:bg-white/30 transition-all duration-300 cursor-pointer"
             onClick={() => handleSongClick(song.spotifyUrl)}
           >
-            {/* Placeholder for album art */}
-            <div className="w-16 h-16 bg-black rounded-md mr-4"></div>
             <div className="flex flex-col">
               <p className="text-lg font-semibold">{song.title}</p>
               <p className="text-sm">{song.artist}</p>
