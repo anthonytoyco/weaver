@@ -1,18 +1,15 @@
 import { TwelveLabs } from "twelvelabs-js";
-import path from "path";
 import dotenv from "dotenv";
 
 // Load environment variables at the top of the file
 dotenv.config();
 
-async function processVideo(req, res) {
+async function twelveAnalyze(file) {
   const apiKey = process.env.TWELVE_LABS_API_KEY;
   const indexKey = process.env.TWELVE_LABS_INDEX_ID;
 
   // 1. Initialize the client
   const client = new TwelveLabs({ apiKey });
-
-  const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
   const retrievedIndex = await client.index.retrieve(indexKey);
   console.log(`ID: ${retrievedIndex.id}`);
@@ -31,11 +28,10 @@ async function processVideo(req, res) {
   }
 
   // 3. Upload a video
-  const videoFilePath = path.join(__dirname, "test.mp4"); // Replace with your video file path
 
   const task = await client.task.create({
     indexId: retrievedIndex.id,
-    file: videoFilePath, // Use the correct 'file' parameter
+    file: file, // Use the correct 'file' parameter
   });
   console.log(`Task id=${task.id} Video id=${task.videoId}`);
 
@@ -57,9 +53,7 @@ async function processVideo(req, res) {
     Topics: gist.topics,
     Hashtags: gist.hashtags,
   };
-  res.send(answer);
+  return answer;
 }
 
-export { processVideo as sendVideo };
-
-processVideo();
+export default twelveAnalyze;
