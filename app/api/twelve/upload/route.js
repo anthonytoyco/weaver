@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-
+import songGenerator from "./songGenerator";
 
 export const config = {
   api: {
@@ -28,7 +28,7 @@ export async function POST(req) {
 
     fs.writeFileSync(filePath, Buffer.from(buffer));
 
-    return NextResponse.json(await processVideo(filePath))
+    return NextResponse.json(songGenerator(filePath))
 
   } catch (err) {
     // Replace this 

@@ -1,16 +1,53 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import MusicPanel from "./components/MusicPanel";
 import LoadingPanel from "./components/LoadingPanel";
 
 export default function Home() {
-
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
   {/* useState */}
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [buildPressed, setBuildPressed] = useState(false);
   const [playlistMade, setPlaylistMade] = useState(false);
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setError(null);
+    if (e.target.files && e.target.files.length == 1) {
+      const selectedFile = e.target.files[0];
+
+      // Basic validation
+      if (!selectedFile.type.startsWith("video/")) {
+        setError("Please select a video file");
+        return;
+      }
+
+      setFile(selectedFile);
+    }
+  }
+
+  async function handleUpload() {
+    if (!file) {
+      setError("Please select a file first");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("video", file);
+
+    try {
+      const response = await fetch("/api/twelve/upload", {
+        method: "POST",
+        body: formData,
+      });
+      setPlaylistMade(true)
+    } catch (err) {
+      const error =
+        err instanceof Error ? err.message : "An unknown error occurred";
+      setError(error);
+    }
+  }
 
   {/* event handlers */}
   const handleButtonClick = () => setBuildPressed(true);
@@ -23,7 +60,7 @@ export default function Home() {
     background: `radial-gradient(circle at ${mousePos.x}px ${mousePos.y}px, #feb47b, #5e77c4)`,
   };
 
-  let playlistBackgroundColor = playlistMade ? "" : "bg-main"
+  const playlistBackgroundColor = playlistMade ? "" : "bg-main"
 
   let buttonText = "BUILD YOUR CUSTOM PLAYLIST";
   if (buildPressed && !playlistMade) {
@@ -40,12 +77,15 @@ export default function Home() {
         <div className={`${buildPressed ? "text-xl" : "text-4xl"} transition-all duration-1000 flex p-8 color-white font-light tracking-[1em] justify-around text-white`}>
           WEAVER
         </div>
-        <div className="flex w-full h-2/3 rounded bg-main">
-          {/* <VideoDisplay /> */}
-        </div>
+        <input
+          onChange={handleFileChange}
+          type="file"
+          accept="video/*"
+          className="w-full h-1/2 bg-black rounded"
+        ></input>
         <div className="flex justify-around w-full">
           <button
-            onClick={handleButtonClick}
+            onClick={() => {handleButtonClick(); handleUpload()}}
             className="flex justify-around items-center w-3/4 h-30 m-5 text-3xl font-bold rounded-full bg-button"
           >
             {buttonText}
