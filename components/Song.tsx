@@ -6,7 +6,7 @@ interface SongProps {
 
 function Song(props: SongProps) {
   return (
-    <div className="flex justify-evenly rounded items-center bg-white">
+    <div className="song flex justify-evenly rounded items-center bg-white">
       <div className="bg-white w-1/4">
         <img src={props.image} alt="song image" />
       </div>

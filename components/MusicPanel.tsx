@@ -1,4 +1,5 @@
 import Song from "./Song";
+import "./Components.css";
 
 function MusicPanel() {
   const songs = [
