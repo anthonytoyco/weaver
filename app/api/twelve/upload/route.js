@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import path from "path";
-import fs from "fs";
-import songGenerator from "./songGenerator";
+import fs from "fs/promises";
+import GenerateSongs from "./songGenerator";
+import { getSession } from "@auth0/nextjs-auth0"; // Import getSession from Auth0
+import fetch from "node-fetch";
 
 export const config = {
   api: {
@@ -14,24 +16,66 @@ export async function POST(req) {
     const formData = await req.formData();
     const file = formData.get("video");
 
+    if (!file) {
+      throw new Error("No file uploaded");
+    }
+
     const UPLOAD_DIR = path.join(process.cwd(), "app", "UPLOADS");
+    await fs.mkdir(UPLOAD_DIR, { recursive: true });
 
     const fileExt = path.extname(file.name).toLowerCase();
     const baseName = path
       .basename(file.name, fileExt)
-      .replace(/[^\w-]/g, "") // Remove special chars
-      .substring(0, 50); // Limit length
+      .replace(/[^\w-]/g, "")
+      .substring(0, 50);
     const filename = `${Date.now()}-${baseName}${fileExt}`;
     const filePath = path.join(UPLOAD_DIR, filename);
 
     const buffer = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(filePath, buffer);
 
-    fs.writeFileSync(filePath, Buffer.from(buffer));
+    // Retrieve Spotify access token using client credentials flow
+    const client_id = process.env.SPOTIFY_CLIENT_ID;
+    const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 
-    return NextResponse.json(songGenerator(filePath));
+    const authOptions = {
+      url: "https://accounts.spotify.com/api/token",
+      method: "POST",
+      headers: {
+        Authorization:
+          "Basic " +
+          Buffer.from(`${client_id}:${client_secret}`).toString("base64"),
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+      }),
+    };
+
+    const spotifyResponse = await fetch(authOptions.url, {
+      method: authOptions.method,
+      headers: authOptions.headers,
+      body: authOptions.body,
+    });
+
+    if (!spotifyResponse.ok) {
+      throw new Error("Failed to fetch Spotify access token");
+    }
+
+    const spotifyData = await spotifyResponse.json();
+    const spotifyAccessToken = spotifyData.access_token;
+
+    console.log("Spotify Access Token:", spotifyAccessToken);
+
+    // Pass the Spotify access token to GenerateSongs
+    const result = await GenerateSongs(filePath, spotifyAccessToken);
+
+    return NextResponse.json(result);
   } catch (err) {
-    // Replace this
-    console.log("Draft");
+    console.error("Error processing upload:", err);
+    return NextResponse.json(
+      { error: "Failed to process upload" },
+      { status: 500 }
+    );
   }
-  return NextResponse.json({ test: "Test" });
 }

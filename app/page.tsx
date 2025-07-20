@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0";
 import MusicPanel from "./components/MusicPanel";
 import LoadingPanel from "./components/LoadingPanel";
-// import VideoDisplay from "./components/VideoDisplay";
 
 export default function Home() {
   {
@@ -16,6 +15,7 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [videoURL, setVideoURL] = useState<string | null>(null);
+  const [songs, setSongs] = useState([]);
 
   {
     /* Auth0 user state */
@@ -67,10 +67,33 @@ export default function Home() {
         body: formData,
       });
 
-      // Simulate loading for 5 seconds
-      setTimeout(() => {
-        setPlaylistMade(true);
-      }, 5000);
+      if (!response.ok) {
+        throw new Error("Failed to generate playlist");
+      }
+
+      const data = await response.json();
+
+      // Define types for track and artist
+      interface Artist {
+        name: string;
+      }
+
+      interface Track {
+        name: string;
+        artists: Artist[];
+      }
+
+      // Format the songs data
+      const formattedSongs = data.songDetails.map(
+        (track: Track, index: number) => ({
+          title: track.name,
+          artist: track.artists.map((artist: Artist) => artist.name).join(", "),
+          spotifyUrl: data.spotifyUrls[index],
+        })
+      );
+
+      setSongs(formattedSongs);
+      setPlaylistMade(true);
     } catch (err) {
       const error =
         err instanceof Error ? err.message : "An unknown error occurred";
@@ -78,14 +101,29 @@ export default function Home() {
     }
   }
 
+  const handleGenerateSongs = async () => {
+    if (!file) {
+      setError("Please select a file first");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("video", file);
+
+    const response = await fetch("/api/twelve/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    setSongs(data.songs);
+  };
+
   {
     /* gradient for div element */
   }
   const gradientStyle = {
     background: `radial-gradient(circle at ${mousePos.x}px ${mousePos.y}px, #feb47b, #5e77c4)`,
   };
-
-  const playlistBackgroundColor = playlistMade ? "" : "bg-main";
 
   let buttonText = "BUILD YOUR CUSTOM PLAYLIST";
   if (buildPressed && !playlistMade) {
@@ -163,13 +201,22 @@ export default function Home() {
         {/* Centered button */}
         <div className="flex justify-center items-center p-8">
           <button
-            onClick={handleButtonClick}
-            disabled={!file}
-            className={`flex justify-center items-center w-3/4 h-30 text-3xl font-bold rounded-full ${
-              file ? "bg-button" : "bg-gray-400 cursor-not-allowed"
+            onClick={() => {
+              if (!buildPressed) {
+                handleButtonClick();
+              } else {
+                // Refresh the page to reset everything
+                window.location.reload();
+              }
+            }}
+            disabled={!file && !buildPressed}
+            className={`flex justify-center items-center w-3/4 h-30 text-3xl font-bold rounded-full transition-all duration-300 ${
+              file || buildPressed
+                ? "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30"
+                : "bg-gray-400 cursor-not-allowed"
             }`}
           >
-            {buttonText}
+            {buildPressed ? "RESET" : "BUILD YOUR CUSTOM PLAYLIST"}
           </button>
         </div>
 
@@ -177,9 +224,7 @@ export default function Home() {
         {error && <div className="text-red-500 text-center mt-4">{error}</div>}
       </div>
       {buildPressed && !playlistMade && <LoadingPanel />}
-      {buildPressed && playlistMade && (
-        <MusicPanel background={playlistBackgroundColor} />
-      )}
+      {buildPressed && playlistMade && <MusicPanel songs={songs} />}
     </div>
   );
 }
