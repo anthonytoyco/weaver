@@ -70,9 +70,9 @@ Whether you're a filmmaker, influencer, or someone who wants to relive their mom
 
 <!-- Add screenshots of the app interface here -->
 
-![Home](https://github.com/anthonytoyco/weaver/blob/prod/misc/home.jpg) <!-- Example screenshot -->
-![Upload](https://github.com/anthonytoyco/weaver/blob/prod/misc/upload.jpg) <!-- Music panel screenshot -->
-![Loading](https://github.com/anthonytoyco/weaver/blob/prod/misc/loading.jpg) <!-- Video upload screenshot -->
+![Home](https://github.com/anthonytoyco/weaver/blob/prod/misc/home.png) <!-- Example screenshot -->
+![Upload](https://github.com/anthonytoyco/weaver/blob/prod/misc/upload.png) <!-- Music panel screenshot -->
+![Loading](https://github.com/anthonytoyco/weaver/blob/prod/misc/loading.png) <!-- Video upload screenshot -->
 ![Generated](https://github.com/anthonytoyco/weaver/blob/prod/misc/done.jpg) <!-- Generated playlist screenshot -->
 
 ---
