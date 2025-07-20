@@ -1,4 +1,5 @@
 import Song from "./Song";
+import "./components.css";
 
 function MusicPanel() {
   const songs = [
@@ -11,6 +12,7 @@ function MusicPanel() {
     <div className="flex flex-col gap-2 w-full bg-black">
       {songs.map((song) => (
         <Song
+          key={song.title}
           songTitle={song.title}
           artist={song.description}
           image="/default-image.png"
