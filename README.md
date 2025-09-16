@@ -80,6 +80,6 @@ Whether you're a filmmaker, influencer, or someone who wants to relive their mom
 ## Try It Out
 
 - 🔗 Live App: [weaver-psi.vercel.app](https://weaver-psi.vercel.app)
-- 📂 GitHub Repo: [GitHub](https://github.com/your-repo-link-here)
+- 💻 Devpost: [Link](https://devpost.com/software/weaver-91liha)
 
 ---
